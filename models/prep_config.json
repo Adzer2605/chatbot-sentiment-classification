@@ -1,0 +1,15 @@
+{
+ "SEED": 42,
+ "MAX_LEN": 64,
+ "MIN_FREQ": 2,
+ "class_weight": {
+  "negatif": 0.773647494999756,
+  "netral": 2.0379079928039063,
+  "positif": 0.8218801824212272
+ },
+ "label2id": {
+  "negatif": 0,
+  "netral": 1,
+  "positif": 2
+ }
+}
