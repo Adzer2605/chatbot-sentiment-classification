@@ -89,7 +89,7 @@ Untuk memahami persepsi masyarakat secara komprehensif, dibutuhkan sistem otomat
 
 ### 2.3 Ringkasan Alur Lifecycle Proyek
 
-Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positif, netral, negatif) menggunakan dataset `indonesian_ai_chatbots_reviews.csv` (29.198 ulasan periode 2024–2026), dilanjutkan pembersihan teks, normalisasi bahasa tidak baku, ekstraksi fitur TF-IDF / tokenisasi, dan *stratified splitting* tanpa *data leakage*. Pada tahap **M**, dirancang tiga model: Logistic Regression sebagai baseline, XGBoost sebagai model advanced, serta Bidirectional LSTM (Bi-LSTM) dengan *Word Embedding* sebagai model deep learning. Pada tahap **O**, dilakukan *hyperparameter tuning* untuk model ML serta optimasi *learning rate*, *batch size*, *dropout*, dan pelatihan minimal 10 *epoch* untuk Bi-LSTM. Pada tahap **P**, ketiga model dievaluasi pada *test set* menggunakan Accuracy, F1-Score, dan Confusion Matrix, lalu hasil *error analysis* digunakan untuk satu iterasi perbaikan pada tahap L/M/O.
+Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positif, netral, negatif) menggunakan dataset `indonesian_ai_chatbots_reviews.csv` (29.198 ulasan periode 2024–2026), dilanjutkan pembersihan teks, normalisasi bahasa tidak baku, ekstraksi fitur TF-IDF / tokenisasi, dan *stratified splitting* tanpa *data leakage*. Pada tahap **M**, dirancang tiga model: Linear SVM sebagai baseline, XGBoost sebagai model advanced, serta Bidirectional LSTM (Bi-LSTM) dengan *Word Embedding* sebagai model deep learning. Pada tahap **O**, dilakukan *hyperparameter tuning* untuk model ML serta optimasi *learning rate*, *batch size*, *dropout*, dan pelatihan minimal 10 *epoch* untuk Bi-LSTM. Pada tahap **P**, ketiga model dievaluasi pada *test set* menggunakan Accuracy, F1-Score, dan Confusion Matrix, lalu hasil *error analysis* digunakan untuk satu iterasi perbaikan pada tahap L/M/O.
 
 ---
 
@@ -99,7 +99,7 @@ Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positi
 
 1. Ulasan pengguna aplikasi AI Chatbot di Indonesia berjumlah puluhan ribu dan tidak terstruktur sehingga sulit dianalisis secara manual; dibutuhkan model otomatis untuk mengklasifikasikan sentimen (positif, netral, negatif).
 2. Teks ulasan berbahasa Indonesia mengandung banyak *noise* (emoji, tanda baca berlebih, singkatan, dan bahasa gaul/*slang*) sehingga memerlukan *preprocessing* teks yang tepat tanpa menimbulkan *data leakage*.
-3. Model berbasis frekuensi kata (TF-IDF) cenderung kesulitan memahami urutan konteks kalimat, negasi, dan sarkasme, sehingga diperlukan perbandingan adil dengan arsitektur *deep learning* sekuensial (*Bi-LSTM*).
+3. Model berbasis frekuensi kata (TF-IDF) seperti Linear SVM dan XGBoost cenderung kesulitan memahami urutan konteks kalimat, negasi, dan sarkasme, sehingga diperlukan perbandingan adil dengan arsitektur *deep learning* sekuensial (*Bi-LSTM*).
 4. Diperlukan analisis kelemahan AI secara objektif melalui *error analysis* pada *confusion matrix* untuk mengetahui pola keluhan pengguna yang paling sering terjadi atau sulit dideteksi model.
 
 ### 3.2 Formulasi Learning Problem (WAJIB)
@@ -107,13 +107,13 @@ Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positi
 | Komponen | Pertanyaan Panduan | Jawaban Anda |
 | --- | --- | --- |
 | **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Label sentimen ulasan (kolom `sentiment`: **positif, netral, negatif**) berdasarkan teks pada kolom `content`. Jenis tugas: klasifikasi teks multikelas (3 kelas), *Natural Language Processing*. |
-| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Meminimalkan *multi-class log-loss* (*categorical cross-entropy*). Metrik keberhasilan utama: **F1-Score (Weighted/Macro)** dan **Accuracy**, dilengkapi Precision, Recall, serta **Confusion Matrix** untuk analisis kesalahan. |
+| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Meminimalkan *hinge loss* dengan regularisasi L2 (pada Linear SVM) serta *multi-class log-loss* / *categorical cross-entropy* (pada XGBoost dan Bi-LSTM). Metrik keberhasilan utama: **F1-Score (Weighted/Macro)** dan **Accuracy**, dilengkapi Precision, Recall, serta **Confusion Matrix** untuk analisis kesalahan. |
 | **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Berkas `indonesian_ai_chatbots_reviews.csv`. Jenis: teks ulasan aplikasi AI Chatbot berbahasa Indonesia. Ukuran: 29.198 baris × 15 kolom (kolom utama: `content`, `sentiment`, `score`, `appName`, `contentLength`, `wordCount`), ±3,3 MB, periode 2024–2026. Asumsi: data dianggap i.i.d. setelah pembersihan duplikat dan dibagi menggunakan *stratified split* agar distribusi kelas antara *train* dan *test* tetap konsisten. |
 
 ### 3.3 Goals
 
 1. Membangun pipeline klasifikasi sentimen tiga kelas pada ulasan aplikasi AI Chatbot Indonesia dengan target **Accuracy > 80%** dan **F1-Score ≥ 0,80** pada *test set*.
-2. Mengukur dan membandingkan performa tiga pendekatan model: Logistic Regression (baseline), XGBoost (advanced), dan Bi-LSTM dengan *Word Embedding* (deep learning) secara objektif.
+2. Mengukur dan membandingkan performa tiga pendekatan model: Linear SVM (baseline), XGBoost (advanced), dan Bi-LSTM dengan *Word Embedding* (deep learning) secara objektif.
 3. Menganalisis kelemahan AI di mata pengguna Indonesia serta pola kesalahan klasifikasi (seperti sarkasme dan negasi) melalui *confusion matrix*.
 4. Menghasilkan kode dan eksperimen yang *reproducible* (*random seed* tetap, versi pustaka tercatat, dan terunggah rapi di GitHub).
 5. **Kontribusi SDG 9:** Menyediakan sistem evaluasi sentimen otomatis untuk memetakan kualitas dan kelemahan aplikasi AI Chatbot di Indonesia guna mendukung peningkatan kapabilitas teknologi industri (Target 9.5).
@@ -122,16 +122,15 @@ Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positi
 
 #### **Model 1 – Baseline Model**
 
-**Logistic Regression** dengan ekstraksi fitur TF-IDF. Model ini dipilih sebagai pembanding dasar karena sederhana, cepat dilatih pada *sparse matrix* berdimensi tinggi, dan memberikan tolok ukur (*benchmark*) performa linier sebelum beralih ke model yang lebih kompleks.
+**Linear Support Vector Machine (Linear SVM)** dengan ekstraksi fitur TF-IDF. Model ini dipilih sebagai pembanding dasar karena sangat efisien pada ruang fitur teks berdimensi tinggi (*sparse matrix*) dan bekerja dengan mencari *hyperplane* pemisah bermargin maksimum, sehingga memberikan tolok ukur (*benchmark*) linier yang kuat sebelum beralih ke model non-linier dan *deep learning*.
 
 #### **Model 2 – Advanced / ML Model**
 
-**XGBoost (Extreme Gradient Boosting)** dengan fitur TF-IDF dan fitur numerik tambahan (`contentLength`). Model ini dipilih karena menerapkan teknik *gradient boosting* yang membangun pohon keputusan secara sekuensial untuk memperbaiki kesalahan prediksi pohon sebelumnya, sehingga mampu menangkap pola non-linier antar fitur kata.
+**XGBoost (Extreme Gradient Boosting)** dengan fitur TF-IDF dan fitur numerik tambahan (`contentLength`). Model ini dipilih karena menerapkan teknik *gradient boosting* yang membangun pohon keputusan secara sekuensial untuk memperbaiki kesalahan prediksi pohon sebelumnya, sehingga mampu menangkap pola interaksi non-linier antar fitur kata dan panjang teks.
 
 #### **Model 3 – Deep Learning Model (WAJIB)**
 
-**Bidirectional LSTM (Bi-LSTM)** dengan *Word Embedding* (jenis data: teks). Model ini dipilih untuk menutupi keterbatasan Logistic Regression dan XGBoost yang hanya melihat frekuensi kata. Bi-LSTM memproses urutan token dari dua arah (maju dan mundur) sehingga mampu menangkap konteks kalimat, negasi, dan hubungan semantik antar kata. Model dilatih minimal 10 *epoch* dengan optimizer Adam, regularisasi *Dropout*, plot *loss* dan *accuracy* per *epoch*, serta evaluasi penuh pada *test set*.
-
+**Bidirectional LSTM (Bi-LSTM)** dengan *Word Embedding* (jenis data: teks). Model ini dipilih untuk menutupi keterbatasan Linear SVM dan XGBoost yang hanya melihat frekuensi kata tanpa urutan. Bi-LSTM memproses urutan token dari dua arah (maju dan mundur) sehingga mampu menangkap konteks kalimat, negasi, dan hubungan semantik antar kata. Model dilatih minimal 10 *epoch* dengan optimizer Adam, regularisasi *Dropout*, plot *loss* dan *accuracy* per *epoch*, serta evaluasi penuh pada *test set*.
 ---
 
 ## 4. DATA UNDERSTANDING **[L]**
