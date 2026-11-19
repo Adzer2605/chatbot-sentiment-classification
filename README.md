@@ -122,15 +122,15 @@ Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positi
 
 #### **Model 1 – Baseline Model**
 
-**Logistic Regression** dengan fitur TF-IDF (unigram dan bigram) dan `class_weight='balanced'`. Model ini dipilih sebagai pembanding dasar karena sederhana, cepat, dan mudah diinterpretasi (bobot kata per kelas dapat diinspeksi), serta kerap menjadi tolok ukur standar analisis sentimen.
+**Logistic Regression** dengan ekstraksi fitur TF-IDF. Model ini dipilih sebagai pembanding dasar karena sederhana, cepat dilatih pada *sparse matrix* berdimensi tinggi, dan memberikan tolok ukur (*benchmark*) performa linier sebelum beralih ke model yang lebih kompleks.
 
 #### **Model 2 – Advanced / ML Model**
 
-**Linear Support Vector Machine (SVM)** dengan fitur TF-IDF yang sama, di-_tuning_ menggunakan Grid Search dan _stratified k-fold cross-validation_ (parameter C, rentang n-gram, `min_df`). Model ini dipilih karena efektif pada ruang fitur _sparse_ berdimensi tinggi dan mencari margin maksimum sehingga berbeda mendasar dari pendekatan probabilistik Logistic Regression.
+**XGBoost (Extreme Gradient Boosting)** dengan fitur TF-IDF dan fitur numerik tambahan (`contentLength`). Model ini dipilih karena menerapkan teknik *gradient boosting* yang membangun pohon keputusan secara sekuensial untuk memperbaiki kesalahan prediksi pohon sebelumnya, sehingga mampu menangkap pola non-linier antar fitur kata.
 
 #### **Model 3 – Deep Learning Model (WAJIB)**
 
-**Fine-tuning IndoBERT** (`indobenchmark/indobert-base-p1`) (jenis data: teks, _pre-trained Transformer_). Model ini dipilih karena representasi kontekstualnya menangkap negasi dan konteks kalimat yang tidak tertangkap TF-IDF, sudah dipra-latih pada korpus bahasa Indonesia, dan cuitan yang pendek (rata-rata sekitar 21 kata) membuatnya layak dilatih di Google Colab atau Kaggle. Model dilatih minimal 10 epoch dengan _weighted cross-entropy_, plot loss dan metrik per epoch, serta evaluasi pada test set. Jika sumber daya GPU terbatas, alternatif cadangannya adalah _Embedding_ + Bi-LSTM.
+**Bidirectional LSTM (Bi-LSTM)** dengan *Word Embedding* (jenis data: teks). Model ini dipilih untuk menutupi keterbatasan Logistic Regression dan XGBoost yang hanya melihat frekuensi kata. Bi-LSTM memproses urutan token dari dua arah (maju dan mundur) sehingga mampu menangkap konteks kalimat, negasi, dan hubungan semantik antar kata. Model dilatih minimal 10 *epoch* dengan optimizer Adam, regularisasi *Dropout*, plot *loss* dan *accuracy* per *epoch*, serta evaluasi penuh pada *test set*.
 
 ---
 
