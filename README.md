@@ -1,6 +1,6 @@
 ## INFORMASI PROYEK
 **Judul Proyek:**  
-Analisis Sentimen Opini Publik di Media Sosial Terhadap Kebijakan PPKM sebagai Evaluasi Transparansi Pemerintah
+Klasifikasi Sentimen Pengguna terhadap Aplikasi AI Chatbot di Indonesia Menggunakan Pendekatan Deep Learning
 
 **Nama Mahasiswa:**  
 1. Iqbal Abdullah  
@@ -14,10 +14,10 @@ Analisis Sentimen Opini Publik di Media Sosial Terhadap Kebijakan PPKM sebagai E
 - **Mata Kuliah:** Data Science
 - **Dosen Pengampu:** Gus Nanang Syaifuddin, S.Kom., M.Kom.  
 - **Tahun Akademik:** 2026/5 
-- **Link GitHub Repository:** https://github.com/Adzer2605/id-ppkm-sentiment-analysis
+- **Link GitHub Repository:** https://github.com/Adzer2605/chatbot-sentiment-classification.git
 - **Link Video Pembahasan:** [URL Video (YouTube/Drive)]  
-- **SDG yang Dipilih:** SDG 16 – Perdamaian, Keadilan, dan Kelembagaan yang Tangguh  
-- **Target SDG yang Relevan:** Target 16.6 – mengembangkan lembaga yang efektif, akuntabel, dan transparan di semua tingkat; serta Target 16.10 – menjamin akses publik terhadap informasi dan Target 16.7 – memastikan pengambilan keputusan yang responsif, inklusif, dan partisipatif
+- **SDG yang Dipilih:** SDG 9 – Industri, Inovasi, dan Infrastruktur  
+- **Target SDG yang Relevan:** Target 9.5 – Meningkatkan penelitian ilmiah dan kemampuan teknologi sektor industri
 
 ## 0. KERANGKA ML LIFECYCLE (L-M-O-P)
 
