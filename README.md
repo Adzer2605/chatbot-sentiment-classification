@@ -97,26 +97,26 @@ Pada tahap **L**, masalah dirumuskan sebagai klasifikasi teks multikelas (positi
 
 ### 3.1 Problem Statements
 
-1. Opini publik terhadap kebijakan PPKM tersebar dalam puluhan ribu cuitan sehingga tidak dapat dipantau secara manual; dibutuhkan model yang mengklasifikasikan sentimen (positif, netral, negatif) secara otomatis dan akurat.
-2. Distribusi kelas sangat tidak seimbang (netral 74,9%, negatif 16,8%, positif 8,3%) sehingga model berisiko mengabaikan kelas minoritas, padahal sentimen negatif adalah sinyal terpenting bagi evaluasi respons publik.
-3. Teks Twitter berbahasa Indonesia bersifat _noisy_ (URL, mention, hashtag, singkatan) dan memuat duplikat, sehingga diperlukan preprocessing yang tepat tanpa menimbulkan kebocoran data (_data leakage_).
-4. Dibutuhkan model _deep learning_ berbasis representasi kontekstual yang dibandingkan secara adil dengan model klasik berbasis TF-IDF, serta metrik evaluasi yang sesuai untuk data tidak seimbang.
+1. Ulasan pengguna aplikasi AI Chatbot di Indonesia berjumlah puluhan ribu dan tidak terstruktur sehingga sulit dianalisis secara manual; dibutuhkan model otomatis untuk mengklasifikasikan sentimen (positif, netral, negatif).
+2. Teks ulasan berbahasa Indonesia mengandung banyak *noise* (emoji, tanda baca berlebih, singkatan, dan bahasa gaul/*slang*) sehingga memerlukan *preprocessing* teks yang tepat tanpa menimbulkan *data leakage*.
+3. Model berbasis frekuensi kata (TF-IDF) cenderung kesulitan memahami urutan konteks kalimat, negasi, dan sarkasme, sehingga diperlukan perbandingan adil dengan arsitektur *deep learning* sekuensial (*Bi-LSTM*).
+4. Diperlukan analisis kelemahan AI secara objektif melalui *error analysis* pada *confusion matrix* untuk mengetahui pola keluhan pengguna yang paling sering terjadi atau sulit dideteksi model.
 
 ### 3.2 Formulasi Learning Problem (WAJIB)
 
 | Komponen | Pertanyaan Panduan | Jawaban Anda |
 | --- | --- | --- |
-| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Label sentimen cuitan (kolom `sentiment`): **0 = positif, 1 = netral, 2 = negatif**. Jenis tugas: klasifikasi teks multikelas (3 kelas), _Natural Language Processing_. |
-| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Meminimalkan _cross-entropy_ berbobot kelas (log-loss + L2 pada Logistic Regression, hinge loss + L2 pada Linear SVM, weighted cross-entropy pada IndoBERT). Metrik utama: **Macro F1-Score** (karena kelas sangat tidak seimbang), dengan pendukung Accuracy, Precision, Recall per kelas (terutama Recall kelas negatif), dan Confusion Matrix. |
-| **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Sumber: [Twitter Dataset PPKM (Kaggle, anggapurnama)](https://www.kaggle.com/datasets/anggapurnama/twitter-dataset-ppkm), berkas `INA_TweetsPPKM_Labeled_Pure.csv`. Jenis: teks berbahasa Indonesia. Ukuran: 23.644 baris × 4 kolom (`Date`, `User`, `Tweet`, `sentiment`), ±5,25 MB, periode Mei 2020 – Maret 2022. Asumsi: cuitan dianggap i.i.d. setelah duplikat dihapus, dengan catatan cuitan terkonsentrasi pada Juli–Agustus 2021 dan satu akun dapat menulis banyak cuitan, sehingga _splitting_ dilakukan _stratified_ setelah deduplikasi untuk mencegah kebocoran data. |
+| **Target** | Apa yang diprediksi? Jenis tugas (klasifikasi biner/multikelas, regresi, forecasting, clustering, dll.)? | Label sentimen ulasan (kolom `sentiment`: **positif, netral, negatif**) berdasarkan teks pada kolom `content`. Jenis tugas: klasifikasi teks multikelas (3 kelas), *Natural Language Processing*. |
+| **Objective** | Apa yang dioptimalkan/diminimalkan secara matematis (misal: cross-entropy, MSE)? Metrik keberhasilan utama? | Meminimalkan *multi-class log-loss* (*categorical cross-entropy*). Metrik keberhasilan utama: **F1-Score (Weighted/Macro)** dan **Accuracy**, dilengkapi Precision, Recall, serta **Confusion Matrix** untuk analisis kesalahan. |
+| **Data** | Sumber, ukuran, jenis, dan asumsi tentang data (i.i.d.? distribusi train vs test?) | Berkas `indonesian_ai_chatbots_reviews.csv`. Jenis: teks ulasan aplikasi AI Chatbot berbahasa Indonesia. Ukuran: 29.198 baris × 15 kolom (kolom utama: `content`, `sentiment`, `score`, `appName`, `contentLength`, `wordCount`), ±3,3 MB, periode 2024–2026. Asumsi: data dianggap i.i.d. setelah pembersihan duplikat dan dibagi menggunakan *stratified split* agar distribusi kelas antara *train* dan *test* tetap konsisten. |
 
 ### 3.3 Goals
 
-1. Membangun model klasifikasi sentimen tiga kelas pada cuitan PPKM dengan Accuracy > 80% dan Macro F1-Score ≥ 0,70 pada test set untuk model terbaik (target awal, dapat disesuaikan setelah EDA).
-2. Mengukur dan membandingkan performa tiga pendekatan model: Logistic Regression + TF-IDF (baseline), Linear SVM + TF-IDF (advanced), dan IndoBERT (deep learning), dengan target model deep learning mengungguli baseline minimal +2 poin Macro F1-Score.
-3. Menjaga Recall kelas negatif ≥ 0,60 pada model terbaik, serta menganalisis kesalahan prediksi dan perbandingan waktu training dan inferensi ketiga model.
-4. Menghasilkan pipeline yang _reproducible_ (random seed 42, versi pustaka tercatat, kode di GitHub).
-5. **Kontribusi SDG 16:** menyediakan alat bantu pemantauan sentimen publik terhadap kebijakan PPKM sebagai indikator proksi respons publik untuk mendukung kelembagaan yang akuntabel dan transparan (Target 16.6, didukung 16.10 dan 16.7).
+1. Membangun pipeline klasifikasi sentimen tiga kelas pada ulasan aplikasi AI Chatbot Indonesia dengan target **Accuracy > 80%** dan **F1-Score ≥ 0,80** pada *test set*.
+2. Mengukur dan membandingkan performa tiga pendekatan model: Logistic Regression (baseline), XGBoost (advanced), dan Bi-LSTM dengan *Word Embedding* (deep learning) secara objektif.
+3. Menganalisis kelemahan AI di mata pengguna Indonesia serta pola kesalahan klasifikasi (seperti sarkasme dan negasi) melalui *confusion matrix*.
+4. Menghasilkan kode dan eksperimen yang *reproducible* (*random seed* tetap, versi pustaka tercatat, dan terunggah rapi di GitHub).
+5. **Kontribusi SDG 9:** Menyediakan sistem evaluasi sentimen otomatis untuk memetakan kualitas dan kelemahan aplikasi AI Chatbot di Indonesia guna mendukung peningkatan kapabilitas teknologi industri (Target 9.5).
 
 ### 3.4 Solution Approach **[M]**
 
