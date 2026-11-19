@@ -63,19 +63,16 @@ Pada proyek ini, mahasiswa diharapkan dapat:
 
 ### 2.1 Latar Belakang
 
-Pemberlakuan Pembatasan Kegiatan Masyarakat (PPKM) adalah kebijakan utama pemerintah Indonesia untuk menekan penyebaran COVID-19 sejak awal 2021. Kebijakan ini memengaruhi mobilitas, kegiatan ekonomi, ibadah, pendidikan, hingga layanan publik. Karena aturannya berubah-ubah (level 1–4, PPKM Mikro, PPKM Darurat, perpanjangan berkala), efektivitasnya sangat bergantung pada seberapa jelas pemerintah mengomunikasikan dasar keputusan dan seberapa baik publik memahaminya.
+Pesatnya perkembangan teknologi Kecerdasan Buatan (Artificial Intelligence/AI), khususnya dalam domain Natural Language Processing (NLP), telah memicu adopsi secara masif aplikasi AI Chatbot di Indonesia (seperti ChatGPT, Claude, dan Gemini). Meskipun adopsinya tinggi, umpan balik dari pengguna di platform digital seperti Google Play Store sering kali tersebar heterogen dan tidak terstruktur. Pengguna menyampaikan beragam reaksi, mulai dari kepuasan terhadap responsivitas aplikasi hingga keluhan terkait "halusinasi" AI, keterbatasan pemahaman bahasa gaul Indonesia, atau kendala infrastruktur aplikasi (seperti lag atau error).
 
-Media sosial, khususnya Twitter, menjadi kanal utama publik untuk bertanya, menyampaikan keluhan, dan merespons kebijakan secara langsung. Volume cuitan yang besar tidak mungkin dibaca manual oleh pembuat kebijakan. Pada dataset yang digunakan, volume cuitan memuncak pada Juli 2021 (9.603 cuitan), bertepatan dengan periode PPKM Darurat, yang menunjukkan bahwa perhatian publik bereaksi kuat terhadap perubahan kebijakan. Analisis sentimen otomatis dapat meringkas arah opini publik (positif, netral, negatif) sehingga lembaga pemerintah dapat mengevaluasi apakah kebijakan dan komunikasinya diterima.
+Untuk memahami persepsi masyarakat secara komprehensif, dibutuhkan sistem otomatisasi yang mampu mengklasifikasikan sentimen pengguna. Proyek ini penting karena mengevaluasi langsung kualitas infrastruktur perangkat lunak AI yang digunakan publik. Dengan membangun pemodelan analisis sentimen berbasis teks ulasan, pengembang aplikasi dapat memperoleh wawasan data-driven mengenai kelemahan produk mereka di pasar lokal.
 
-Studi terdahulu menunjukkan bahwa analisis sentimen cuitan PPKM layak dilakukan dengan _machine learning_: Hansun dkk. (2022) menemukan sentimen netral dominan (58,07%), diikuti positif (27,12%) dan negatif (14,81%), lalu membangun model berbasis LSTM. Untuk bahasa Indonesia, model pra-latih IndoBERT (Wilie dkk., 2020) menyediakan representasi kontekstual yang relevan. Proyek ini membandingkan tiga pendekatan, yaitu Logistic Regression dengan TF-IDF, Linear SVM dengan TF-IDF, dan _fine-tuning_ IndoBERT.
 
 **Referensi:**
 
-> Hansun, S., Suryadibrata, A., Nurhasanah, R., & Fitra, J. (2022). Tweets sentiment on PPKM policy as a Covid-19 response in Indonesia. _Indian Journal of Computer Science and Engineering (IJCSE), 13_(1), 51–58.
-
-> Wilie, B., Vincentio, K., Winata, G. I., Cahyawijaya, S., Li, X., Lim, Z. Y., ... & Purwarianti, A. (2020). IndoNLU: Benchmark and resources for evaluating Indonesian natural language understanding. _Proceedings of AACL-IJCNLP 2020_, 843–857.
-
-> United Nations. _Goal 16: Promote peaceful and inclusive societies for sustainable development, provide access to justice for all and build effective, accountable and inclusive institutions at all levels_. https://sdgs.un.org/goals/goal16
+> Minaee, S., Kalchbrenner, N., Cambria, E., Nikzad, N., Chenaghlu, M., & Gao, J. (2021). Deep Learning--based Text Classification: A Comprehensive Review. *ACM Computing Surveys (CSUR)*, 54(3), 1-40.
+> Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
+> Chen, T., & Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining*, 785–794.
 
 ### 2.2 Keterkaitan dengan SDGs (WAJIB)
 
