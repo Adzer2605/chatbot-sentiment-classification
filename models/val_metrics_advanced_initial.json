@@ -1,0 +1,12 @@
+{
+  "model": "XGBoost (Initial)",
+  "train_accuracy": 0.7239422409988019,
+  "train_macro_f1": 0.6978452008595469,
+  "val_accuracy": 0.600058858151854,
+  "val_macro_precision": 0.5599087524684706,
+  "val_macro_recall": 0.5573296317857798,
+  "val_macro_f1": 0.5533348094987821,
+  "val_weighted_f1": 0.6144470477223846,
+  "train_time_sec": 781.9240574836731,
+  "val_inf_time_sec": 0.34525156021118164
+}
