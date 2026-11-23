@@ -312,18 +312,21 @@ Setelah pembersihan, rasio kelas terbesar : terkecil pada data training adalah 2
  
 #### 6.1.1 Deskripsi Model **[M]**
  
-**Nama Model:** [Nama model, misal: Logistic Regression]  
+**Nama Model:** Linear Support Vector Machine (`LinearSVC`) dengan ekstraksi fitur TF-IDF  
 **Teori Singkat:**  
-[Jelaskan secara singkat bagaimana model ini bekerja]  
+Linear SVM adalah algoritma klasifikasi linear yang mencari *hyperplane* pemisah antar kelas dengan margin maksimum (*maximum-margin classifier*). Untuk klasifikasi multikelas (3 kelas: negatif, netral, positif), `LinearSVC` menggunakan strategi *One-vs-Rest* (OvR), yaitu melatih tiga pemisah linear biner (masing-masing memisahkan satu kelas terhadap dua kelas lainnya) lalu memilih kelas dengan skor fungsi keputusan tertinggi.  
 **Alasan Pemilihan:**  
-[Mengapa memilih model ini sebagai baseline?]
+1. Representasi TF-IDF (`ngram_range=(1,2)`, `max_features=20000`) menghasilkan matriks *sparse* berdimensi tinggi; Linear SVM sangat cepat dan efektif pada ruang fitur seperti ini tanpa memerlukan kernel non-linear yang mahal.
+2. Sekitar 28,4% ulasan mentah hanya terdiri dari 1–2 kata dengan sinyal sentimen eksplisit (mis. "bagus", "mantap", "tolol", "error") yang mudah dipisahkan secara linear.
+3. Mendukung `class_weight='balanced'` secara native untuk menangani ketidakseimbangan kelas sedang (rasio 2,63 : 1, kelas minoritas `netral` 16,36%).
  
 #### 6.1.2 Hypothesis Space & Inductive Bias **[M]**
  
-- **Model family / arsitektur:** [misal: model linear]
-- **Hypothesis space:** [himpunan fungsi yang dapat direpresentasikan, misal: batas keputusan linear]
-- **Inductive bias / asumsi:** [misal: hubungan fitur-target linear, fitur independen]
-- **Implikasi terhadap dataset Anda:** [apakah asumsi cocok dengan data?]
+- **Model family / arsitektur:** Model linear (*maximum-margin linear classifier*).
+- **Hypothesis space:** Himpunan fungsi keputusan linear $f_k(\mathbf{x}) = \mathbf{w}_k^\top \mathbf{x} + b_k$ untuk $k \in \{\text{negatif}, \text{netral}, \text{positif}\}$ pada ruang TF-IDF berdimensi $d = 20.000$, dengan prediksi $\hat{y} = \arg\max_k f_k(\mathbf{x})$ dan batas keputusan berupa bidang datar (*hyperplane*).
+- **Inductive bias / asumsi:** Sentimen diasumsikan dapat dipisahkan secara linear dari kombinasi bobot unigram/bigram tanpa interaksi non-linear antar fitur; *hyperplane* bermargin maksimum ($\Vert{}\mathbf{w}_k\Vert{}_2$ terkecil) diasumsikan memiliki generalisasi terbaik; urutan global kata diabaikan di luar bigram.
+- **Implikasi terhadap dataset Anda:** Cocok untuk memisahkan ulasan positif dan negatif yang memiliki kata kunci tegas, tetapi terbatas pada kalimat panjang berkontras ("bagus tapi sering error") yang dominan di kelas netral, sarkasme, serta *label noise* dari rating bintang.
+
 #### 6.1.3 Implementasi (Ringkas) **[M]**
  
 ```python
