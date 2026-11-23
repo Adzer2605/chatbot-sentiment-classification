@@ -421,18 +421,42 @@ Berdasarkan EDA (Bab 4.4), panjang ulasan (`contentLength`) berbeda tajam antar 
 #### 6.2.3 Implementasi (Ringkas) **[M]**
  
 ```python
-# Contoh kode
-from sklearn.ensemble import RandomForestClassifier
- 
-model_advanced = RandomForestClassifier(
+from scipy.sparse import hstack, csr_matrix
+from xgboost import XGBClassifier
+
+X_train_num = csr_matrix(train_df[['contentLength', 'n_excl']].values.astype('float32'))
+X_val_num = csr_matrix(val_df[['contentLength', 'n_excl']].values.astype('float32'))
+
+X_train_xgb = hstack([X_train_tfidf, X_train_num]).tocsr()
+X_val_xgb = hstack([X_val_tfidf, X_val_num]).tocsr()
+
+model_advanced = XGBClassifier(
     n_estimators=100,
-    max_depth=10,
-    random_state=42
+    max_depth=6,
+    learning_rate=0.1,
+    objective='multi:softprob',
+    num_class=3,
+    eval_metric='mlogloss',
+    tree_method='hist',
+    random_state=42,
+    n_jobs=-1
 )
-model_advanced.fit(X_train, y_train)
-y_pred_advanced = model_advanced.predict(X_test)
+model_advanced.fit(X_train_xgb, y_train, sample_weight=sample_weight_train)
+y_pred_val_advanced = model_advanced.predict(X_val_xgb)
 ```
  
+---
+
+**Perbandingan Awal pada Validation Set (Minggu 3):**
+
+| Model | Train Acc | Train Macro F1 | Val Acc | Val Macro Prec | Val Macro Rec | Val Macro F1 | Val Weighted F1 | Training Time | Inference Time (Val) |
+|-------|-----------|----------------|---------|----------------|---------------|--------------|-----------------|---------------|----------------------|
+| Baseline — Linear SVM (C=1.0) | 0.9489 | 0.9434 | 0.6530 | 0.5699 | 0.5703 | 0.5699 | 0.6494 | 2.14s | 0.008s |
+| Advanced — XGBoost (Initial) | 0.7239 | 0.6978 | 0.6001 | 0.5599 | 0.5573 | 0.5533 | 0.6144 | 781.92s (~13m 2s) | 0.345s |
+
+**Catatan perbandingan awal:**
+Pada konfigurasi awal sebelum tuning, **Linear SVM** masih unggul dibanding **XGBoost** di seluruh metrik validasi (Val Accuracy +5,30 poin, Val Macro F1 +1,65 poin, Val Weighted F1 +3,49 poin) dengan waktu pelatihan ~365x lebih cepat (2,14 detik vs 781,92 detik). Hasil ini selaras dengan kelemahan XGBoost pada Bab 6.2.1: pada matriks TF-IDF *sparse* berdimensi 20.000, pohon keputusan dengan `n_estimators=100` dan `max_depth=6` belum cukup menangkap seluruh fitur kata penting. Meski demikian, *gap* train–val XGBoost lebih kecil (12,39 poin vs 29,59 poin pada Linear SVM), sehingga performanya masih berpotensi ditingkatkan melalui *hyperparameter tuning* (`n_estimators`, `max_depth`, `colsample_bytree`, `subsample`, dan `learning_rate`) pada Minggu 4 (Bab 6.2.4).
+
 #### 6.2.4 Optimization: Hyperparameter Tuning **[O]**
  
 **Parameter yang digunakan:**
