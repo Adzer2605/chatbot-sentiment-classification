@@ -1,0 +1,12 @@
+{
+  "model": "Linear SVM (Baseline)",
+  "train_accuracy": 0.9489249006873068,
+  "train_macro_f1": 0.9433952050932772,
+  "val_accuracy": 0.6530311948204827,
+  "val_macro_precision": 0.5699264000257296,
+  "val_macro_recall": 0.5703001352516692,
+  "val_macro_f1": 0.5698566996167919,
+  "val_weighted_f1": 0.6493685985766015,
+  "train_time_sec": 2.140693187713623,
+  "val_inf_time_sec": 0.007877349853515625
+}
