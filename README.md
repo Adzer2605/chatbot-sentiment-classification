@@ -393,25 +393,31 @@ Model membedakan kelas positif (F1 0.7330) dan negatif (F1 0.7197) dengan cukup 
  
 #### 6.2.1 Deskripsi Model **[M]**
  
-**Nama Model:** [Nama model, misal: Random Forest / XGBoost]  
+**Nama Model:** Extreme Gradient Boosting (`XGBClassifier`) dengan gabungan fitur TF-IDF + fitur numerik (`contentLength`, `n_excl`) 
 **Teori Singkat:**  
-[Jelaskan bagaimana algoritma ini bekerja]
+XGBoost adalah algoritma ensemble berbasis Gradient Boosted Decision Trees (GBDT) yang membangun pohon keputusan (CART) secara sekuensial. Setiap pohon baru dilatih untuk memperbaiki kesalahan residu (gradien dan hessian orde kedua dari multi-class log-loss) dari gabungan pohon sebelumnya, disertai penalti regularisasi L1 dan L2 pada bobot daun.
  
 **Alasan Pemilihan:**  
-[Mengapa memilih model ini?]
+Berdasarkan EDA (Bab 4.4), panjang ulasan (`contentLength`) berbeda tajam antar sentimen (median negatif 11 kata vs positif 4 kata), dan tanda seru (`n_excl`) menandai penekanan emosi. XGBoost dapat menggabungkan matriks sparse TF-IDF dengan fitur numerik tersebut tanpa scaling sekaligus menangkap interaksi non-linear antar fitur.
  
 **Keunggulan:**
  
-- [Sebutkan keunggulan]
+- Mampu memodelkan interaksi fitur non-linear secara otomatis dan menggabungkan fitur teks + numerik tanpa normalisasi skala.
+- Memiliki kontrol overfitting bawaan (`max_depth`, `subsample`, `colsample_bytree`, regularisasi L1/L2) serta metode `tree_method='hist'` yang cepat.
+- Mendukung `sample_weight` untuk menangani ketidakseimbangan kelas netral.
+
 **Kelemahan:**
  
-- [Sebutkan kelemahan]
+- Pada matriks TF-IDF berdimensi sangat tinggi dan sparse (20.000 kolom), pemecahan pohon per satu fitur kata cenderung kurang efisien dibanding model linear bila parameter belum dituning.
+- Waktu training lebih lama dan lebih sensitif terhadap hyperparameter dibanding Linear SVM.
+
 #### 6.2.2 Hypothesis Space & Inductive Bias **[M]**
  
-- **Model family / arsitektur:** [misal: ensemble pohon keputusan]
-- **Hypothesis space:** [fungsi non-linear piecewise, interaksi fitur otomatis, dll.]
-- **Inductive bias / asumsi:** [misal: data tabular dengan struktur ambang/threshold]
-- **Perbandingan dengan baseline:** [apa yang bisa dipelajari model ini yang tidak bisa baseline?]
+- **Model family / arsitektur:** Additive ensemble pohon keputusan (Gradient Boosted Decision Trees).
+- **Hypothesis space:** Himpunan fungsi non-linear piecewise-constant hasil penjumlahan $M$ pohon regresi per kelas: $\hat{y}{i,k} = \text{softmax}(\sum{m=1}^{M} \eta f_{m,k}(\mathbf{x}i))$, dengan $f{m,k} \in \mathcal{F}_{\text{CART}}$ berkedalaman maksimal `max_depth`.
+- **Inductive bias / asumsi:** Batas keputusan dibentuk dari partisi ambang batas (axis-aligned splits) secara berjenjang pada nilai fitur TF-IDF dan numerik; kesalahan kompleks dapat didekati secara aditif oleh kumpulan weak learners dangkal.
+- **Perbandingan dengan baseline:** Linear SVM hanya menjumlahkan bobot kata secara independen (batas keputusan datar), sedangkan XGBoost dapat mempelajari aturan interaksi kondisional (mis. kombinasi kata positif + `contentLength` panjang + kata "tapi" yang mengarah ke netral/negatif).
+
 #### 6.2.3 Implementasi (Ringkas) **[M]**
  
 ```python
