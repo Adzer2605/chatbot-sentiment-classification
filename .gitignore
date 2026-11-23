@@ -223,3 +223,9 @@ data/*
 !data/.gitkeep
 .ipynb_checkpoints/
 __pycache__/
+
+models/*.joblib
+models/*.pkl
+models/*.h5
+models/*.keras
+models/*.pt
