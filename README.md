@@ -330,31 +330,64 @@ Linear SVM adalah algoritma klasifikasi linear yang mencari *hyperplane* pemisah
 #### 6.1.3 Implementasi (Ringkas) **[M]**
  
 ```python
-# Contoh kode (opsional, bisa dipindah ke GitHub)
-from sklearn.linear_model import LogisticRegression
- 
-model_baseline = LogisticRegression(C=1.0, max_iter=100)
-model_baseline.fit(X_train, y_train)
-y_pred_baseline = model_baseline.predict(X_test)
-```
- 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC
+
+tfidf = TfidfVectorizer(
+    ngram_range=(1, 2),
+    max_features=20000,
+    min_df=2,
+    sublinear_tf=True
+)
+X_train_tfidf = tfidf.fit_transform(train_df['clean'])
+X_val_tfidf = tfidf.transform(val_df['clean'])
+
+model_baseline = LinearSVC(
+    C=1.0,
+    class_weight='balanced',
+    max_iter=2000,
+    random_state=42,
+    dual='auto'
+)
+model_baseline.fit(X_train_tfidf, y_train)
+y_pred_val_baseline = model_baseline.predict(X_val_tfidf)
+``` 
+
 #### 6.1.4 Optimization: Objective, Hyperparameter & Regularisasi **[O]**
  
-**Objective/loss yang dioptimalkan:** [misal: log-loss + L2]  
+**Objective/loss yang dioptimalkan:** Squared Hinge Loss berbobot kelas + regularisasi L2
+
 **Parameter yang digunakan:**
  
 ```
-[Tuliskan parameter penting, contoh:]
 - C (regularization): 1.0
-- solver: 'lbfgs'
-- max_iter: 100
+- penalty: 'l2'
+- loss: 'squared_hinge'
+- class_weight: 'balanced' (negatif: 0.7736, netral: 2.0379, positif: 0.8219)
+- max_iter: 2000
+- random_state: 42
 ```
  
 #### 6.1.5 Hasil Awal **[O → P]**
  
-**[Tuliskan hasil awal pada validation set; evaluasi akhir pada test set dijelaskan di Bab 7]**
- 
----
+**Hasil evaluasi awal pada validation set (3.398 sampel; test set tidak dipakai):**
+```
+- Training Time: 2.14s | Inference Time (val): 0.008s
+- Train Accuracy: 0.9489 | Train Macro F1: 0.9434
+- Val Accuracy: 0.6530
+- Val Macro Precision: 0.5699
+- Val Macro Recall: 0.5703
+- Val Macro F1-Score: 0.5699
+- Val Weighted F1-Score: 0.6494
+```
+
+| Kelas   | Precision | Recall | F1-Score | Support |
+| ------- | --------- | ------ | -------- | ------- |
+| negatif | 0.7134    | 0.7261 | 0.7197   | 1.464   |
+| netral  | 0.2704    | 0.2446 | 0.2568   | 556     |
+| positif | 0.7260    | 0.7402 | 0.7330   | 1.378   |
+
+Model membedakan kelas positif (F1 0.7330) dan negatif (F1 0.7197) dengan cukup baik, tetapi lemah pada kelas netral (F1 0.2568). Terdapat gap besar sebesar 29,59 poin persentase antara skor training (0.9489) dan validasi (0.6530), yang mengindikasikan overfitting pada ruang fitur 20.000 dimensi dengan regularisasi default C=1.0.
  
 ### 6.2 Model 2 — ML / Advanced Model
  
